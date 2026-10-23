@@ -1,0 +1,1 @@
+import{r as e}from"./request-Cu6J7zxr.js";const n={submit(r){return e.post("/reservations",r)},my(){return e.get("/reservations/my")},list(r){return e.get("/reservations",{params:r})},audit(r,t){return e.put(`/reservations/${r}/audit`,{status:t})},cancel(r){return e.delete(`/reservations/${r}`)}};export{n as r};

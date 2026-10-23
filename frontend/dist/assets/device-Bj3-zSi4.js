@@ -1,0 +1,1 @@
+import{r}from"./request-Cu6J7zxr.js";const d={list(e){return r.get("/devices",{params:e})},create(e){return r.post("/devices",e)},update(e,t){return r.put(`/devices/${e}`,t)},remove(e){return r.delete(`/devices/${e}`)}};export{d};

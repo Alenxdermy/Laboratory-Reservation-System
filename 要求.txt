@@ -1,0 +1,110 @@
+1、实验目的
+本实验旨在通过构建一个完整的“实验室预约与设备管理系统”，让学生深入理解并掌握前后端分离架构下的全栈开发流程。具体目标包括：
+掌握 Vue 2组合式 API：熟练使用 vue相关语法及组件化开发。
+理解状态管理与路由：使用 Pinia 进行全局状态管理，使用 Vue Router 实现页面跳转与权限控制。
+精通后端 Servlet 分层架构：摆脱传统 JSP 模式，掌握基于原生 HttpServlet 的分层设计（Entity-DAO-Service-Servlet），理解 Filter 拦截器机制及统一响应格式的设计。
+实践数据可视化与文件处理：集成 ECharts 展示统计数据，实现基于 Multipart 的文件上传功能。
+培养工程化思维：通过 Axios 封装、CORS 跨域处理、Token 认证等机制，提升系统的安全性与可维护性。
+2、实验内容
+学生需独立或分组完成以下模块的开发与集成：
+基础架构搭建：配置  Vue2 前端环境，配置 Tomcat 10 + Java 17 后端环境，建立 MySQL 数据库连接。
+用户认证模块：实现注册、登录、角色区分（学生/教师/管理员），基于 Token 的身份验证及路由守卫。
+资源管理模块：实现实验室和设备的 CRUD（增删改查），支持状态管理（空闲/占用/维修）。
+核心业务模块：实现预约功能，包含时间段冲突检测、防超员逻辑、审核流程（通过/拒绝）。
+辅助功能模块：
+统计可视化：使用 ECharts 展示各实验室周使用率。
+操作日志：记录关键操作（谁、何时、做了什么）。
+文件上传：支持上传实验报告或设备图片。
+3、实验知识点
+前端技术：Vue 3 (Composition API), Vite, Vue Router 4, Pinia, Element Plus, Axios, ECharts。
+后端技术：Java 17, Jakarta EE (Servlet 5.0/JSP 3.0 for Tomcat 10), JDBC, Druid 连接池, Jackson/Gson。
+数据库：MySQL 8.0+，SQL 事务控制，索引优化。
+核心概念：RESTful API 设计规范，MVC/MVVM 设计模式，CORS 跨域资源共享，JWT/Token 认证原理，文件流处理。
+4、实验时长
+本实验建议总时长为 8 课时（约 4次课，每次2 课时）：
+第 1-2 课时：环境搭建、数据库设计、后端基础架构（Util, DAO, Entity）及登录接口实现。
+第 3-4 课时：前端基础框架搭建、Axios 封装、登录页面开发、路由守卫配置。
+第 5-6 课时：实验室/设备管理模块（前后端联调）、预约核心逻辑（冲突检测）实现。
+第 7-8 课时：统计图表、文件上传、日志模块开发、系统整体测试与优化。
+5、实验环境
+操作系统：Windows 10/11, macOS 或 Linux。
+开发工具：
+IDE: IntelliJ IDEA (Ultimate/Community) 或 VS Code。
+JDK: OpenJDK 17 或 Oracle JDK 17。
+Web Server: Apache Tomcat 10.1.x (注意：Tomcat 10 使用 jakarta.* 包名，而非 javax.*)。
+Database: MySQL 8.0+。
+Node.js: v16+ (用于 Vite 构建)。
+依赖管理：Maven (后端), npm/pnpm (前端)。
+二、实验分析
+6.1 系统架构设计
+系统采用典型的前后端分离架构。
+前端：负责页面渲染、用户交互、数据展示。通过 Axios 发送 HTTP 请求，接收 JSON 数据。
+后端：作为 API 服务器，处理业务逻辑。
+Filter 层：处理字符编码、CORS 跨域、Token 合法性校验。
+Servlet 层：接收请求，调用 Service，返回 JSON。
+Service 层：核心业务逻辑（如预约冲突检测、权限判断）。
+DAO 层：直接操作数据库。
+数据库：存储持久化数据。
+6.2 数据库设计 (ER 简述)
+user: id, username, password, role (student/teacher/admin), create_time
+lab: id, name, capacity, status (available/maintenance), description
+device: id, lab_id, name, model, status
+reservation: id, user_id, lab_id, start_time, end_time, status (pending/approved/rejected), create_time
+log: id, user_id, action, detail, create_time
+6.3 关键技术难点
+Tomcat 10 兼容性：必须使用 jakarta.servlet 包，否则类加载失败。
+预约冲突检测：需确保同一实验室在同一时间段内，已批准的预约人数不超过容量，且时间不重叠。
+跨域问题：前端端口（如 5173）与后端端口（如 8080）不同，需后端配置 CORS Filter。
+三、实验步骤
+1、步骤 1：数据库初始化与后端基础构建
+1.1 创建数据库与表
+在 MySQL 中执行以下 SQL 脚本。
+CREATE DATABASE IF NOT EXISTS lab_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; USE lab_system;  -- 用户表 CREATE TABLE `user` (     `id` INT AUTO_INCREMENT PRIMARY KEY,     `username` VARCHAR(50) NOT NULL UNIQUE,     `password` VARCHAR(100) NOT NULL,     `role` ENUM('student', 'teacher', 'admin') DEFAULT 'student',     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP );  -- 实验室表 CREATE TABLE `lab` (     `id` INT AUTO_INCREMENT PRIMARY KEY,     `name` VARCHAR(100) NOT NULL,     `capacity` INT NOT NULL DEFAULT 30,     `status` ENUM('available', 'maintenance') DEFAULT 'available',     `description` TEXT );  -- 预约表 CREATE TABLE `reservation` (     `id` INT AUTO_INCREMENT PRIMARY KEY,     `user_id` INT NOT NULL,     `lab_id` INT NOT NULL,     `start_time` DATETIME NOT NULL,     `end_time` DATETIME NOT NULL,     `status` ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,     FOREIGN KEY (`user_id`) REFERENCES `user`(`id`),     FOREIGN KEY (`lab_id`) REFERENCES `lab`(`id`) );  -- 操作日志表 CREATE TABLE `log` (     `id` INT AUTO_INCREMENT PRIMARY KEY,     `user_id` INT,     `action` VARCHAR(100),     `detail` TEXT,     `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP );  -- 插入初始数据 INSERT INTO `user` (`username`, `password`, `role`) VALUES ('admin', '123456', 'admin'); INSERT INTO `lab` (`name`, `capacity`, `status`) VALUES ('计算机实验室A', 40, 'available'); INSERT INTO `lab` (`name`, `capacity`, `status`) VALUES ('物理实验室B', 30, 'available'); 复制
+1.2 后端项目结构搭建 (Maven)
+创建 Maven 项目，pom.xml 关键依赖如下（注意 Jakarta EE）：
+                   jakarta.servlet         jakarta.servlet-api         5.0.0         provided                        com.fasterxml.jackson.core         jackson-databind         2.15.2                        mysql         mysql-connector-java         8.0.33                        com.alibaba         druid         1.2.18       复制
+1.3 编写核心工具类与实体
+DbUtil.java (数据库连接工具)
+package com.lab.util;  import com.alibaba.druid.pool.DruidDataSource; import javax.sql.DataSource; import java.sql.Connection; import java.sql.SQLException;  public class DbUtil {     private static DataSource dataSource;      static {         try {             DruidDataSource ds = new DruidDataSource();             ds.setUrl("jdbc:mysql://localhost:3306/lab_system?useSSL=false&serverTimezone=UTC");             ds.setUsername("root"); // 请替换为你的用户名             ds.setPassword("password"); // 请替换为你的密码             ds.setDriverClassName("com.mysql.cj.jdbc.Driver");             ds.setInitialSize(5);             dataSource = ds;         } catch (Exception e) {             throw new RuntimeException("Database initialization failed", e);         }     }      public static Connection getConnection() throws SQLException {         return dataSource.getConnection();     } } 复制
+Result.java (统一响应格式)
+package com.lab.result;  public class Result {     private int code;     private String msg;     private T data;      public Result(int code, String msg, T data) {         this.code = code;         this.msg = msg;         this.data = data;     }      public static  Result ok(String msg, T data) {         return new Result<>(200, msg, data);     }      public static  Result fail(String msg) {         return new Result<>(500, msg, null);     }          // Getters and Setters omitted for brevity but required for Jackson     public int getCode() { return code; }     public void setCode(int code) { this.code = code; }     public String getMsg() { return msg; }     public void setMsg(String msg) { this.msg = msg; }     public T getData() { return data; }     public void setData(T data) { this.data = data; } } 复制
+JsonUtil.java (JSON 处理)
+package com.lab.util;  import com.fasterxml.jackson.databind.ObjectMapper; import jakarta.servlet.http.HttpServletResponse; import java.io.IOException;  public class JsonUtil {     private static final ObjectMapper mapper = new ObjectMapper();      public static void write(HttpServletResponse resp, Object obj) throws IOException {         resp.setContentType("application/json;charset=utf-8");         mapper.writeValue(resp.getWriter(), obj);     }          public static  T read(jakarta.servlet.ServletRequest req, Class clazz) throws IOException {         return mapper.readValue(req.getInputStream(), clazz);     } } 复制
+测评点 1： 启动 Tomcat 服务器，访问任意一个尚未实现的 Servlet 路径（或直接检查控制台无报错）。确保 DbUtil 能成功获取连接。
+预期结果：控制台无异常抛出，若编写一个简单的测试 Main 方法调用 DbUtil.getConnection()，应返回非空 Connection 对象。
+2、步骤 2：后端核心业务逻辑实现
+2.1 实体类 (Entity)
+创建 User.java, Lab.java, Reservation.java，字段与数据库对应，包含 Getter/Setter。
+2.2 DAO 层示例 (LabDao)
+package com.lab.dao;  import com.lab.entity.Lab; import com.lab.util.DbUtil; import java.sql.*; import java.util.ArrayList; import java.util.List;  public class LabDao {     public List findAll() throws SQLException {         List labs = new ArrayList<>();         String sql = "SELECT * FROM lab";         try (Connection conn = DbUtil.getConnection();              PreparedStatement ps = conn.prepareStatement(sql);              ResultSet rs = ps.executeQuery()) {             while (rs.next()) {                 Lab lab = new Lab();                 lab.setId(rs.getInt("id"));                 lab.setName(rs.getString("name"));                 lab.setCapacity(rs.getInt("capacity"));                 lab.setStatus(rs.getString("status"));                 labs.add(lab);             }         }         return labs;     } } 复制
+2.3 Service 层示例 (ReserveService - 冲突检测)
+package com.lab.service;  import com.lab.dao.ReservationDao; import com.lab.entity.Reservation; import java.sql.SQLException; import java.time.LocalDateTime;  public class ReserveService {     private ReservationDao dao = new ReservationDao();      /**      * 检查预约冲突      * 规则：同一实验室，时间重叠，且状态为 approved 或 pending      */     public boolean hasConflict(int labId, LocalDateTime start, LocalDateTime end) throws SQLException {         // SQL: SELECT count(*) FROM reservation          // WHERE lab_id = ? AND status IN ('approved', 'pending')          // AND start_time < ? AND end_time > ?         return dao.countConflicts(labId, start, end) > 0;     }          public boolean submitReservation(Reservation res) throws SQLException {         if (hasConflict(res.getLabId(), res.getStartTime(), res.getEndTime())) {             return false; // 冲突         }         return dao.insert(res) > 0;     } } 复制
+2.4 Servlet 示例 (LabServlet)
+package com.lab.servlet;  import com.lab.dao.LabDao; import com.lab.result.Result; import com.lab.util.JsonUtil; import jakarta.servlet.ServletException; import jakarta.servlet.annotation.WebServlet; import jakarta.servlet.http.HttpServlet; import jakarta.servlet.http.HttpServletRequest; import jakarta.servlet.http.HttpServletResponse; import java.io.IOException; import java.sql.SQLException;  @WebServlet("/api/labs") public class LabServlet extends HttpServlet {     private LabDao labDao = new LabDao();      @Override     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {         try {             resp.setContentType("application/json;charset=utf-8");             JsonUtil.write(resp, Result.ok("success", labDao.findAll()));         } catch (SQLException e) {             JsonUtil.write(resp, Result.fail("Database error: " + e.getMessage()));         }     } } 复制
+2.5 Filter 配置 (CorsFilter & AuthFilter)
+CorsFilter.java:
+package com.lab.filter;  import jakarta.servlet.*; import jakarta.servlet.annotation.WebFilter; import jakarta.servlet.http.HttpServletResponse; import java.io.IOException;  @WebFilter("/*") public class CorsFilter implements Filter {     @Override     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {         HttpServletResponse httpResp = (HttpServletResponse) resp;         httpResp.setHeader("Access-Control-Allow-Origin", "*");         httpResp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");         httpResp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");                  if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) req).getMethod())) {             httpResp.setStatus(HttpServletResponse.SC_OK);             return;         }         chain.doFilter(req, resp);     } } 复制
+测评点 2： 部署后端项目到 Tomcat。使用 Postman 或浏览器访问 [http://localhost:8080/your_context_path/api/labs](http://localhost:8080/your_context_path/api/labs)。
+预期结果：返回 JSON 数据，格式为 {"code":200, "msg":"success", "data":[...]}，其中 data 包含数据库中插入的实验室信息。同时检查 Response Headers 中是否包含 Access-Control-Allow-Origin: *。
+3、步骤 3：前端项目搭建与基础功能
+3.1 初始化 Vue 3 项目
+npm create vite@latest lab-client -- --template vue cd lab-client npm install npm install vue-router pinia axios element-plus echarts 复制
+3.2 Axios 封装 (src/utils/request.js)
+import axios from 'axios' import { ElMessage } from 'element-plus'  const request = axios.create({   baseURL: '[http://localhost:8080/lab-system/api](http://localhost:8080/lab-system/api)', // 根据实际 Context Path 调整   timeout: 10000 })  // 请求拦截器 request.interceptors.request.use(config => {   const token = localStorage.getItem('token')   if (token) {     config.headers['Authorization'] = token   }   return config })  // 响应拦截器 request.interceptors.response.use(response => {   const res = response.data   if (res.code !== 200) {     ElMessage.error(res.msg || 'Error')     return Promise.reject(new Error(res.msg || 'Error'))   }   return res }, error => {   ElMessage.error(error.message || 'Network Error')   return Promise.reject(error) })  export default request 复制
+3.3 登录页面与逻辑 (src/views/Login.vue)
+     复制
+3.4 路由配置 (src/router/index.js)
+import { createRouter, createWebHistory } from 'vue-router' import Login from '../views/Login.vue' import Dashboard from '../views/Dashboard.vue'  const routes = [   { path: '/login', component: Login },   {      path: '/dashboard',      component: Dashboard,     meta: { requiresAuth: true }    },   { path: '/', redirect: '/login' } ]  const router = createRouter({   history: createWebHistory(),   routes })  router.beforeEach((to, from, next) => {   if (to.meta.requiresAuth && !localStorage.getItem('token')) {     next('/login')   } else {     next()   } })  export default router 复制
+测评点 3： 启动前端开发服务器 (npm run dev)。在浏览器访问 [http://localhost:5173](http://localhost:5173)。
+输入正确的用户名密码（如 admin/123456，需确保后端 LoginServlet 已实现并返回正确 Token）。
+点击登录。
+预期结果：页面成功跳转至 /dashboard，且 LocalStorage 中存在 token 字段。若输入错误密码，Element Plus 应弹出错误提示消息。
+4、步骤 4：高级功能实现（统计与文件上传）
+4.1 统计模块 (ECharts)
+在 Dashboard.vue 中引入 ECharts。
+后端：创建 StatServlet，查询各实验室本周预约次数，返回 JSON。
+前端：
+import * as echarts from 'echarts' import { onMounted, ref } from 'vue' import request from '@/utils/request'  const chartRef = ref(null)  onMounted(async () => {   const res = await request.get('/stats/weekly-usage')   const myChart = echarts.init(chartRef.value)   myChart.setOption({     title: { text: '各实验室周使用率' },     xAxis: { type: 'category', data: res.data.labels }, // ['Lab A', 'Lab B']     yAxis: { type: 'value' },     series: [{ data: res.data.values, type: 'bar' }] // [12, 8]   }) }) 复制
+4.2 文件上传模块
+后端：创建 UploadServlet，使用 req.getPart("file") 获取 MultipartFile，保存至服务器磁盘，并记录日志。
+前端：使用 Element Plus  组件，action 指向上传接口，headers 携带 Token。

@@ -1,0 +1,83 @@
+/* ============================================================
+   framed-sheet 设计令牌
+   来源：design-taste-frontend · app 风格单（seed 1631832333）
+   规则：一个底色、一个墨色、一个强调色；静止表面无阴影；
+        色彩只出现在数据、状态与一个主操作上。
+   ============================================================ */
+:root {
+  /* 表面与线 */
+  --ground: #f9fbfc;
+  --frame: #f6f8f9;
+  --surface: #ffffff;
+  --raised: #f4f6f8;
+  --active: #ebedee;
+  --border: #e8eaec;
+  --rule: #f0f1f2;
+  --control: #cdced1;
+
+  /* 文字三层 */
+  --text: #131416;
+  --muted: #5d5f60;
+  --faint: #6b6b6b;
+
+  /* 强调与数据 */
+  --accent: #1b6c80;
+  --accent-tint: #e9f2f4;
+  --chart-1: #1b6c80;
+  --chart-2: #2f70bb;
+  --chart-3: #a86f0c;
+
+  /* 状态 */
+  --positive: #1e7b4f;
+  --negative: #c4242a;
+  --warning: #92400e;
+  --pill-positive-bg: #dcfae5;
+  --pill-positive-ink: #04250e;
+  --pill-negative-bg: #ffedea;
+  --pill-negative-ink: #831c1e;
+  --pill-warning-bg: #fffbeb;
+  --pill-warning-ink: #92400e;
+  --pill-neutral-bg: #ebedee;
+  --pill-neutral-ink: #353736;
+
+  /* 尺寸 */
+  --radius-card: 8px;
+  --radius-control: 6px;
+  --radius-sheet: 16px;
+  --sidebar-width: 228px;
+  --topbar-height: 48px;
+  --sheet-inset: 8px;
+  --gap: 24px;
+  --pad: 24px;
+  --control-height: 32px;
+  --row-height: 48px;
+
+  /* 字阶 */
+  --fs-title: 22px;
+  --fs-section: 16px;
+  --fs-kpi: 28px;
+  --fs-body: 14px;
+  --fs-small: 12px;
+  --font-sans: "IBM Plex Sans", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+
+  /* Element Plus 主题映射 */
+  --el-color-primary: #1b6c80;
+  --el-color-primary-light-3: #4a8fa0;
+  --el-color-primary-light-5: #7fb0bd;
+  --el-color-primary-light-7: #b4d0d7;
+  --el-color-primary-light-8: #cde0e4;
+  --el-color-primary-light-9: #e9f2f4;
+  --el-color-primary-dark-2: #145364;
+  --el-color-success: #1e7b4f;
+  --el-color-danger: #c4242a;
+  --el-color-warning: #92400e;
+  --el-font-size-base: 14px;
+  --el-text-color-primary: #131416;
+  --el-text-color-regular: #5d5f60;
+  --el-border-color: #e8eaec;
+  --el-border-color-light: #f0f1f2;
+  --el-fill-color-blank: #ffffff;
+  --el-border-radius-base: 6px;
+  --el-border-radius-small: 4px;
+}

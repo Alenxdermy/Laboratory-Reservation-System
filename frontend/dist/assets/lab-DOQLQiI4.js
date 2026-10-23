@@ -1,0 +1,1 @@
+import{r}from"./request-Cu6J7zxr.js";const a={list(){return r.get("/labs")},create(e){return r.post("/labs",e)},update(e,t){return r.put(`/labs/${e}`,t)},remove(e){return r.delete(`/labs/${e}`)}};export{a as l};
